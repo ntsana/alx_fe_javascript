@@ -40,24 +40,36 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
-    #formContainer, #importExportContainer { margin-top: 30px; }
+    #formContainer, #importExportContainer {
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
 
+  <!-- Random quote category selection -->
   <div>
-    <label for="categorySelect">Choose a category:</label>
+    <label for="categorySelect">Choose a category for random quote:</label>
     <select id="categorySelect"></select>
+  </div>
+
+  <!-- Quote filter dropdown -->
+  <div>
+    <label for="categoryFilter">Filter by Category:</label>
+    <select id="categoryFilter" onchange="filterQuotes()">
+      <option value="all">All Categories</option>
+    </select>
   </div>
 
   <div id="quoteDisplay">Click “Show New Quote” to begin!</div>
 
   <button id="newQuote">Show New Quote</button>
 
+  <!-- Dynamic form container -->
   <div id="formContainer"></div>
 
-  <!-- JSON Import/Export -->
+  <!-- Import / Export -->
   <div id="importExportContainer">
     <h3>Import / Export Quotes</h3>
     <input type="file" id="importFile" accept=".json" />
@@ -67,5 +79,4 @@
   <script src="script.js"></script>
 </body>
 </html>
-
 
