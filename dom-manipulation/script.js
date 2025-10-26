@@ -176,7 +176,7 @@ function notifyUser(message) {
 }
 
 // Fetch and sync server quotes
-async function fetchServerQuotes() {
+async function fetchQuotesFromServer() {
   try {
     const response = await fetch(SERVER_URL);
     if (!response.ok) throw new Error("Failed to fetch server data");
@@ -231,4 +231,4 @@ if (lastQuote) {
 }
 
 // Periodically sync with server every 30 seconds
-setInterval(fetchServerQuotes, 30000);
+setInterval(fetchQuotesFromServer, 30000);
