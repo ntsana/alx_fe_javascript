@@ -197,25 +197,6 @@ function notifyUser(message) {
   setTimeout(() => notification.remove(), 5000);
 }
 
-// Fetch quotes from server and merge
-async function fetchQuotesFromServer() {
-  try {
-    const response = await fetch(SERVER_URL);
-    if (!response.ok) throw new Error("Failed to fetch server data");
-
-    const serverData = await response.json();
-    const serverQuotes = serverData.slice(0, 10).map(item => ({
-      id: item.id,
-      text: item.title || item.text,
-      category: item.body || "General"
-    }));
-
-    mergeQuotes(serverQuotes);
-  } catch (err) {
-    console.error("Server fetch error:", err);
-  }
-}
-
 // Merge server quotes with local
 function mergeQuotes(serverQuotes) {
   let updated = false;
@@ -237,6 +218,25 @@ function mergeQuotes(serverQuotes) {
   }
 }
 
+// **Sync function**
+async function syncQuotes() {
+  try {
+    const response = await fetch(SERVER_URL);
+    if (!response.ok) throw new Error("Failed to fetch server data");
+
+    const serverData = await response.json();
+    const serverQuotes = serverData.slice(0, 10).map(item => ({
+      id: item.id,
+      text: item.title || item.text,
+      category: item.body || "General"
+    }));
+
+    mergeQuotes(serverQuotes);
+  } catch (err) {
+    console.error("Sync error:", err);
+  }
+}
+
 // Event listeners
 newQuoteBtn.addEventListener("click", showRandomQuote);
 exportBtn.addEventListener("click", exportQuotes);
@@ -252,6 +252,6 @@ if (lastQuote) {
   quoteDisplay.textContent = `"${lastQuote.text}" — (${lastQuote.category})`;
 }
 
-// Periodically fetch from server every 30s
-setInterval(fetchQuotesFromServer, 30000);
+// Periodically sync with server every 30 seconds
+setInterval(syncQuotes, 30000);
 
