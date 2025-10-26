@@ -172,15 +172,15 @@ function importFromJsonFile(event) {
       quotes.push(...importedQuotes);
       saveQuotes();
       populateCategories();
-      alert("Quotes imported successfully!");
+      notifyUser("Quotes imported successfully!");
     } catch (err) {
-      alert("Failed to import quotes: " + err.message);
+      notifyUser("Failed to import quotes: " + err.message);
     }
   };
   fileReader.readAsText(event.target.files[0]);
 }
 
-// Notification
+// Notification function
 function notifyUser(message) {
   const notification = document.createElement("div");
   notification.textContent = message;
@@ -210,9 +210,10 @@ async function fetchQuotesFromServer() {
       category: item.body || "General"
     }));
 
-    mergeQuotes(serverQuotes);
+    return serverQuotes;
   } catch (err) {
     console.error("Server fetch error:", err);
+    return [];
   }
 }
 
@@ -233,7 +234,7 @@ function mergeQuotes(serverQuotes) {
   if (updated) {
     saveQuotes();
     populateCategories();
-    notifyUser("Quotes synced with server. Conflicts resolved.");
+    notifyUser("Quotes synced with server! Conflicts resolved.");
   }
 }
 
@@ -246,9 +247,11 @@ async function syncQuotes() {
     }
 
     // Fetch server quotes
-    await fetchQuotesFromServer();
+    const serverQuotes = await fetchQuotesFromServer();
+    mergeQuotes(serverQuotes);
 
-    notifyUser("Quotes synced with server successfully!");
+    // Notify successful sync (even if no conflicts)
+    notifyUser("Quotes synced with server!");
   } catch (err) {
     console.error("Error syncing quotes:", err);
     notifyUser("Failed to sync quotes.");
@@ -272,4 +275,3 @@ if (lastQuote) {
 
 // Periodically sync quotes every 30 seconds
 setInterval(syncQuotes, 30000);
-
