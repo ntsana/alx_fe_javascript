@@ -91,7 +91,7 @@ function addQuote() {
     return;
   }
 
-  const newId = quotes.length ? Math.max(...quotes.map(q => q.id)) + 1 : 1;
+  const newId = quotes.length ? Math.max(...quotes.map(q => q.id)) + 1 : 101; // start new local quotes at 101
   const newQuote = { id: newId, text: newText, category: newCategory };
   quotes.push(newQuote);
   saveQuotes();
@@ -168,7 +168,7 @@ function importFromJsonFile(event) {
     try {
       const importedQuotes = JSON.parse(event.target.result);
       if (!Array.isArray(importedQuotes)) throw new Error("Invalid JSON format");
-      importedQuotes.forEach(q => { if(!q.id) q.id = quotes.length ? Math.max(...quotes.map(q=>q.id))+1 : 1; });
+      importedQuotes.forEach(q => { if(!q.id) q.id = quotes.length ? Math.max(...quotes.map(q=>q.id))+1 : 101; });
       quotes.push(...importedQuotes);
       saveQuotes();
       populateCategories();
@@ -197,6 +197,25 @@ function notifyUser(message) {
   setTimeout(() => notification.remove(), 5000);
 }
 
+// Fetch quotes from server
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    if (!response.ok) throw new Error("Failed to fetch server data");
+
+    const serverData = await response.json();
+    const serverQuotes = serverData.slice(0, 10).map(item => ({
+      id: item.id,
+      text: item.title || item.text,
+      category: item.body || "General"
+    }));
+
+    mergeQuotes(serverQuotes);
+  } catch (err) {
+    console.error("Server fetch error:", err);
+  }
+}
+
 // Merge server quotes with local
 function mergeQuotes(serverQuotes) {
   let updated = false;
@@ -218,22 +237,21 @@ function mergeQuotes(serverQuotes) {
   }
 }
 
-// **Sync function**
+// Sync quotes function (bi-directional)
 async function syncQuotes() {
   try {
-    const response = await fetch(SERVER_URL);
-    if (!response.ok) throw new Error("Failed to fetch server data");
+    // Post local new quotes to server (simulate id>100 as new local quotes)
+    for (const quote of quotes) {
+      if (quote.id > 100) await postQuoteToServer(quote);
+    }
 
-    const serverData = await response.json();
-    const serverQuotes = serverData.slice(0, 10).map(item => ({
-      id: item.id,
-      text: item.title || item.text,
-      category: item.body || "General"
-    }));
+    // Fetch server quotes
+    await fetchQuotesFromServer();
 
-    mergeQuotes(serverQuotes);
+    notifyUser("Quotes synced with server successfully!");
   } catch (err) {
-    console.error("Sync error:", err);
+    console.error("Error syncing quotes:", err);
+    notifyUser("Failed to sync quotes.");
   }
 }
 
@@ -242,7 +260,7 @@ newQuoteBtn.addEventListener("click", showRandomQuote);
 exportBtn.addEventListener("click", exportQuotes);
 importFile.addEventListener("change", importFromJsonFile);
 
-// Initialize
+// Initialize app
 populateCategories();
 createAddQuoteForm();
 
@@ -252,6 +270,6 @@ if (lastQuote) {
   quoteDisplay.textContent = `"${lastQuote.text}" — (${lastQuote.category})`;
 }
 
-// Periodically sync with server every 30 seconds
+// Periodically sync quotes every 30 seconds
 setInterval(syncQuotes, 30000);
 
