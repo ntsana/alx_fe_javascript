@@ -25,29 +25,38 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       font-style: italic;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     button {
       padding: 10px 20px;
-      margin-top: 10px;
+      margin: 10px 5px;
       border: none;
       border-radius: 8px;
       background-color: #007bff;
       color: #fff;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
     button:hover {
       background-color: #0056b3;
     }
 
-    input {
+    #controls, #formContainer, #storageControls {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
       padding: 8px;
       margin: 5px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      width: 200px;
     }
 
     select {
@@ -55,22 +64,31 @@
       margin: 5px;
       border-radius: 5px;
     }
+
+    small {
+      display: block;
+      margin-top: 8px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
 
-  <div>
+  <div id="controls">
     <label for="categorySelect">Choose a category:</label>
     <select id="categorySelect"></select>
   </div>
 
   <div id="quoteDisplay">Click “Show New Quote” to begin!</div>
 
-  <button id="newQuote">Show New Quote</button>
+  <div>
+    <button id="newQuote">Show New Quote</button>
+  </div>
 
-  <!-- The add-quote form will be created dynamically by JS -->
+  
   <div id="formContainer"></div>
+  <div id="storageControls"></div>
 
   <script src="script.js"></script>
 </body>
